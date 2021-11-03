@@ -118,13 +118,13 @@ person.year.counts <- data %>% unnest_tokens(word, text) %>%
 
 top_terms <- 
   person.year.counts %>%
-  group_by(screen_name, year) %>% # TODO: Complete
+  group_by() %>% # Add arguments to group_by
   top_n(10, n) %>%
   ungroup() %>%
   arrange(word, -n)
 
 X <- "" # Choose the screen name of a politician
-top_terms  %>% filter(screen_name == X) %>% # Remove filter
+top_terms  %>% filter(screen_name == X) %>%
   mutate(word = reorder(word, n)) %>%
   ggplot(aes(word, n, fill = factor(year))) +
   geom_col(show.legend = FALSE) +
