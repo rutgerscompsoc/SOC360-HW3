@@ -16,7 +16,9 @@ knitr::opts_chunk$set(warning = FALSE)
 knitr::opts_chunk$set(message = FALSE)
 knitr::opts_chunk$set(error = TRUE)
 
-# Required packages, please install any you do not have
+# Required packages
+# You should have these from previous homeworks and lecture slides, but 
+# please install any that are missing
 library(rmarkdown)
 library(tidyverse)
 library(knitr)
@@ -29,6 +31,8 @@ library(viridis)
 library(parallel)
 library(reshape2)
 library(magrittr)
+
+set.seed(10980) # Setting random seed
 ```
 
 # Instructions
@@ -214,27 +218,21 @@ What do you observe when you look at the results? Do these similarities make any
 Let's continue our analysis using word embeddings.
 
 Q9. Use the `word2vec` function to train an embedding model using the *entire corpus*. Complete the function to use the skip-gram model with 100 dimensional vectors, a window size of 3, and 5 negative samples. Set the minimum word count to equal 10.
-
-To speed things up we will set `threads = detectCores()` to run the process in parallel.
 ```{r q9, echo=TRUE, tidy=TRUE}
-set.seed(10980)
-
-print(detectCores()) # This will show how many cores you have available
 model <- word2vec::word2vec(x = tolower(data$text), 
                   type=, # complete argument
                   dim=, # complete argument
                   window = , # complete argument
                   negative= , # complete argument
-                  iter=10L,
-                  threads = detectCores())
+                  iter=10L)
 ```
 
 Let's analyze how politicians are represented in this model. Choose a keyword and run the chunk (you will need to ensure the term you use is in the vocabulary, you will get an error if a word is not recognized). Answer the question below.
 ```{r q9, echo=TRUE, tidy=TRUE}
-keyword <- "" # add appropriate term here
+keyword <- "" # Select an appropriate term here
 predict(model, keyword, type = "nearest", top_n = 20)
 ```
-What does the result show? Do these results make any sense? Answer:
+Describe what the results show. Do these results make any sense? Answer:
 
 # *Part 3: Topic models*
 
@@ -243,7 +241,7 @@ For the final part of this assignment you will train a topic model on the corpus
 The code below creates a new variable called `party`, indicating whether a politician is a Democrat or a Republican. To help make the computation easier we will restrict our focus to the subset of tweets that were written in 2021.
 
 Q.13
-Modify the `textProcessor` function to use the same set of stopwords as used in the analysis above. You will also need to modify the `removestopwords` argument, otherwise the model will remove the stopwords above and those in the preset lexicon. *Note: It make take a couple of minutes for this chunk to run.*
+Modify the `textProcessor` function to use the same stopwords as  above. You will also need to modify the `removestopwords` argument, otherwise the model will remove the stopwords above *and* those in the preset lexicon. *Note: It make take a couple of minutes for this chunk to run.*
 ```{r q13, echo=TRUE, tidy=TRUE}
 data$party <- factor(ifelse(data$screen_name %in% c("JoeBiden","KamalaHarris","SpeakerPelosi","BernieSanders","AOC","SenSchumer"), "Democrat", "Republican"))
 data <- data %>% filter(year == 2021)
@@ -313,4 +311,5 @@ plot(fit, type="perspectives", topics=) # Add topic number
 ```
 What is this topic about? Do the differences appear to be meaningful?
 
+## End
 This is the end of the assignment. Follow the submission instructions at the beginning of this document. The procedure is the same as for the previous assignments, but please read the note on line 48 carefully.
