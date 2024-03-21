@@ -267,7 +267,7 @@ plot(fit, type = "summary")
 
 doc.props <- make.dt(fit) # gets document proportions
 doc.count <- dim(doc.props)[1] # gets number of documents
-top5<-  doc.props %>% summarize_if() %>% # complete arguments
+top5 <- doc.props %>% summarize_if() %>% # complete arguments
   select_if(str_detect(names(.), "Topic")) %>%
   divide_by(doc.count) %>% t() %>% as.data.frame() %>%
   top_n(5)
