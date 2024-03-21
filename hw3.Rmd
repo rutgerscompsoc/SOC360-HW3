@@ -40,15 +40,7 @@ set.seed(10980) # Setting random seed
 This assignment is designed to build your familiarity with the natural language processing techniques covered in class. As in the previous assignments, it will involve a combination of short written answers and coding in R. All answers should be written in this document. *Please write answers to written questions outside of the code cells rather than as comments.*
 
 ### Requirements
-You should be viewing this document in RStudio. If you have not done so already, make sure to install the required packages (see initial chunk). You can do this by clicking the ``Install`` button in the Packages tab in the lower-right corner of RStudio and following the directions on the installation menu. You can also install packages by entering ``install.packages(x)`` into the R Console, where ``x`` is the name of the package.
-
-### Submitting the homework
-Once you have finished the assignment please complete the following steps to submit it:
-
-1. Click on the ``Knit`` menu at the top of the screen and select ``Knit to HTML``. This will execute the all of the code and render the RMarkdown document in HTML. Verify that this document contains all of your answers and that none of the chunks produce error messages.
-2. Add this document *and* the HTML file to Github. Use ``Homework submitted`` as your main commit message.
-3. Push the commit to Github.
-4. Visit the Github repository in your browser and verify that the final version of both files has been correctly uploaded.
+You should be viewing this document in RStudio. If you have not done so already, make sure to install the required packages (see initial chunk). You can do this by clicking the ``Install`` button in the Packages tab in the lower-right corner of RStudio and following the directions on the installation menu. You can also install packages by entering ``install.packages(x)`` into the R Console, where ``x`` is the name of the package. Do not leave these commands in the final document.
 
 # **Part I: From text to vector representations**
 
@@ -69,7 +61,8 @@ print(unique(data$screen_name)) # This shows the screen names
 ### Downsampling data (Optional)
 I encourage you to attempt this assignment using the full version of the dataset. If you find that your computer is struggling due to the size of the data (RStudio is crashing, overheating, running out of memory, etc.), then uncomment and run the cell below to take a random sample of the data. You may change `n` to be smaller or larger as necessary.
 
-*Even if you plan to use the full dataset, I would recommend using a sub-sample for testing your code. Once you have answered all questions you can go back and run the code with all the data.*
+*Even if you plan to use the full dataset, I would recommend using a sub-sample for testing your code. Once you have answered all questions you can go back and comment this out before knitting your document.*
+
 ```{r sampling, echo=FALSE, tidy=TRUE, eval=TRUE, include=FALSE}
 #n <- 5000
 #data <- sample_n(data, n)
@@ -268,7 +261,7 @@ Q.15. We can plot the topic proportions to get the topics that occur most freque
 
 We can extract these values by manipulating results of the `make.dt` function, which provides us with a vector of topic proportions for each document. This code uses `doc.props` and `doc.count` create a object creating the average proportion of each topic over all documents (the result should have the dimension `K x 1`). The results the 5 topics with the highest proportions in the corpus. 
 
-Add arguments to `summarize_if` to take the sum of all numeric columns in `doc.props`.
+Review the code carefully then add arguments to `summarize_if` to take the sum of all numeric columns in `doc.props`.
 ```{r q15, echo=TRUE, tidy=TRUE}
 plot(fit, type = "summary")
 
@@ -281,7 +274,7 @@ top5<-  doc.props %>% summarize_if() %>% # complete arguments
 print(top5)
 ```
 
-Q.16. Explore these five topics using any of the functions covered in lecture or in the `stm` documentation (e.g. `findThoughts`, `labelTopics`) then provide names and descriptions below.
+Q.16. Explore these five topics using any of the functions covered in lecture or the `stm` documentation (e.g. `findThoughts`, `labelTopics`), then provide names and descriptions below.
 ```{r q16, echo=TRUE, tidy=TRUE}
 
 ```
@@ -293,7 +286,7 @@ Name and describe each of the five topics.
   4. Name: Description:
   5. Name: Description:
   
-Q. 17. Use the`estimateEffect` function covered in lecture to analyze the relationship between the covariate and the topic. 
+Q. 17 (OPTIONAL EXTRA CREDIT). Use the`estimateEffect` function covered in lecture to analyze the relationship between the covariate and the topic. 
 
 Modify the first argument of `estimateEffect` to specify the same formula as used for prevalence in the `stm` function. e.g. `1:K ~ a + b`.
 
@@ -305,11 +298,19 @@ plot(prep, "month", method = "continuous", topics = c(), model = fit, xaxt = "n"
 ```
 What do you notice? Are these topics stable over time or do they vary over time? Are these changes meaningful in the context of current events?
 
-Q.18 Select a topic of interest and plot the differences in content by partisanship. Answer the question below.
+Q.18 (OPTIONAL EXTRA CREDIT) Select a topic of interest and plot the differences in content by partisanship. Answer the question below.
 ```{r q18, echo=TRUE, tidy=TRUE}
 plot(fit, type="perspectives", topics=) # Add topic number
 ```
-What is this topic about? Do the differences appear to be meaningful?
+What is this topic about? Are the differences meaningful?
 
 ## End
-This is the end of the assignment. Follow the submission instructions at the beginning of this document. The procedure is the same as for the previous assignments, but please read the note on line 48 carefully.
+This is the end of the assignment. Follow the submission instructions below to submit your document. The procedure is the same as for the previous assignments.
+
+### Submitting the homework
+Once you have finished the assignment, please complete the following steps to submit it:
+
+  1. Click on the ``Knit`` menu at the top of the screen and select ``Knit to HTML``. This will execute all of the code and render the RMarkdown document in HTML. Verify that this document contains all of your answers and that none of the chunks produce error messages.
+  2. Add this document *and* the HTML file to Github. Use ``Homework submitted`` as your main commit message.
+  3. Push the commit to Github.
+  4. Visit the Github repository in your browser and verify that the final version of both files has been correctly uploaded.
