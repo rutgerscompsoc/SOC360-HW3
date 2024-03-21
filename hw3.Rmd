@@ -40,28 +40,29 @@ set.seed(10980) # Setting random seed
 This assignment is designed to build your familiarity with the natural language processing techniques covered in class. As in the previous assignments, it will involve a combination of short written answers and coding in R. All answers should be written in this document. *Please write answers to written questions outside of the code cells rather than as comments.*
 
 ### Requirements
-You should be viewing this document in RStudio. If you have not done so already, make sure to install the required packages (see initial chunk). You can do this by clicking the ``Install`` button in the Packages tab in the lower-right corner of RStudio and following the directions on the installation menu. You can also install packages by entering ``install.packages(x)`` into the R Console, where ``x`` is the name of the package. Do not leave these commands in the final document.
+You should be viewing this document in RStudio. If you have not done so already, make sure to install the required packages (see initial chunk). You can do this by clicking the ``Install`` button in the Packages tab in the lower-right corner of RStudio and following the directions on the installation menu. You can also install packages by entering ``install.packages(x)`` into the R Console, where ``x`` is the name of the package. Do not leave any `install.packages()` commands in the final document.
 
 # **Part I: From text to vector representations**
 
-The data consist of a set of tweets from 12 prominent politicians in the United States, 6 Democrats and 6 Republicans. The data cover the period from 2020 to late 2021. The entire timeline for each politician was collected (Twitter provides the ~3200 most recent tweets) but the dataset has been filtered to contain tweets from 2020 onwards. Note that politicians who tweet very frequently might not have any tweets for 2020 (i.e. if they wrote more than 3200 tweets in 2021).
+The data consist of a set of tweets from 12 prominent politicians in the United States, 6 Democrats and 6 Republicans. The data cover the period from 2020 to late 2021 (*RIP the Twitter Academic API*). The entire timeline for each politician was collected (Twitter provides the ~3200 most recent tweets) but the dataset has been filtered to contain tweets from 2020 onwards. Note that politicians who tweet very frequently might not have any tweets for 2020 (i.e. if they wrote more than 3200 tweets in 2021, as 3200 was the maximum Twitter provided).
 
 *Please make sure to run the chunk above to load the necessary packages for this assignment. You may need to install some of the packages if you have not done so already* 
 
-Once you have done this, run this chunk to load the data. The regular expressions should remove hashtags, mentions, and URLs, as well as exact duplicates.
+Run this chunk to load and preparte the data. The regular expressions should remove hashtags, mentions, and URLs, as well as exact duplicates.
 ```{r loading data, echo=FALSE, tidy=TRUE, eval=TRUE, include=FALSE}
+# DO NOT MODIFY THIS CHUNK
 data <- read_csv('data/politics_twitter.csv')
+
 data <- data %>% 
     mutate(text = gsub("#[A-Za-z0-9]+|@[A-Za-z0-9]", "", text)) %>% # Removing hashtags and mentions
     mutate(text = gsub("(http[^ ]*)|(www.[^ ]*)", "", text)) %>% # Removing URLs
-    distinct(text, .keep_all =TRUE) # Removing duplicates
+    mutate(text = gsub("’", "'", text)) %>% # Replacing special character
+    distinct(text, .keep_all = TRUE) # Removing duplicates
 print(unique(data$screen_name)) # This shows the screen names
 ```
 
 ### Downsampling data (Optional)
-I encourage you to attempt this assignment using the full version of the dataset. If you find that your computer is struggling due to the size of the data (RStudio is crashing, overheating, running out of memory, etc.), then uncomment and run the cell below to take a random sample of the data. You may change `n` to be smaller or larger as necessary.
-
-*Even if you plan to use the full dataset, I would recommend using a sub-sample for testing your code. Once you have answered all questions you can go back and comment this out before knitting your document.*
+I encourage you to attempt this assignment using the full version of the dataset. If you find that your computer is struggling due to the size of the data (RStudio is crashing, overheating, running out of memory, etc.), then uncomment and run the cell below to take a random sample of the data to use for analyses below. You may change `n` to be smaller or larger as necessary.
 
 ```{r sampling, echo=FALSE, tidy=TRUE, eval=TRUE, include=FALSE}
 #n <- 5000
@@ -71,9 +72,9 @@ I encourage you to attempt this assignment using the full version of the dataset
 ### Questions
 Q.1 Before analyzing the language, let's take a look at the dataset to see what it contains. Please write code to do the following.
 
-a. Use group_by and summarize to show the number of tweets they each politician wrote.
+a. Calculate the number of tweets each politician wrote.
 
-b. Use group_by and summarize to print the median number of tweets per politician for each month and year in the dataset. The results should show a single value for each month-year pair.
+b. Calculate the median number of tweets for each month and year in the dataset. The results should show a single value for each month-year pair.
 ```{r q1, echo=FALSE, tidy=TRUE}
 # a
 
@@ -91,7 +92,7 @@ words %>% count(word, sort = TRUE) %>%
   ggplot(aes(n, word)) + geom_col() +
   labs(y = NULL, x='Term frequency', title=paste("10 most frequent terms in corpus"))
 ```
-What are the top three most frequent words? Explain why this result is expected based on Zipf's law. Answer: 
+What are the top three most frequent words? Explain this result in the context of Zipf's law. Answer: 
 
 Q.3: Let's remove the stopwords. If you run the code below, you will see that the term `amp` is the most frequent term. Add this term to the `stop_words` list. Hint: You will need to create an object with the same structure as `stop_words` then merge them together. You can add any string in the lexicon column as it is ignored in the join. Finally, complete the filter argument to retain only stopwords from the "snowball" lexicon.
 ```{r q3, echo=TRUE, tidy=TRUE}
@@ -112,7 +113,7 @@ words.2 %>% count(word, sort = TRUE) %>%
   labs(y = NULL, x='Term frequency', title=paste("10 most frequent terms"), caption = "Stopwords removed.")
 ```
 
-Q4. Let's analyze how the language used by each politician varies and how this varies over time. Complete the `group_by` statement to count the words used by each politician in each year. Next, assign `X` to be the name of one of the people in the dataset. Answer the question below.
+Q4. Let's analyze how the language used by each politician varies and how this varies over time. Complete the `group_by` statement to count the words used by each politician in each year. Next, assign `X` to be the screen name of one of the politicians in the dataset. Answer the question below.
 ```{r q4, echo=TRUE, tidy=TRUE}
 person.year.counts <- data %>% unnest_tokens(word, text) %>%
   anti_join(stop_words) %>%
@@ -135,7 +136,7 @@ top_terms  %>% filter(screen_name == X) %>%
 ```
 What do the results tell you about this politician? Does their language vary between 2020 and 2021? Answer:
 
-Q5. Modify the filter to look at another politician. Answer the questions below.
+Q5. Modify the code to look at another politician. Answer the questions below.
 ```{r q5, echo=TRUE, tidy=TRUE}
 Y <- "" # Choose another figure here
 top_terms %>% filter(screen_name == Y) %>%
@@ -147,7 +148,7 @@ top_terms %>% filter(screen_name == Y) %>%
 ```
 Do you notice any differences between the two politicians?  Answer:
 
-Q6. Let's create a TF-IDF weighted document-term matrix, where each document is a politician-year pair. This will help to compare how politicians use language. Review the documentation for the `unite` function. Next, add arguments to the `unite` function to create a new column called `person_year` where the value is the string for the person's handle and the year, e.g "AOC_2021". Make sure to include an argument to avoid dropping the original columns.
+Q6. Let's create a TF-IDF weighted document-term matrix, where each document is a politician-year pair. This will help to compare how politicians use language. Review the documentation for the `unite` function. Next, add arguments to the `unite` function to create a new column called `person_year` where the value is the string for the person's handle and the year, e.g "AOC_2021". Make sure to include an argument to `unite` to avoid dropping the original columns.
 ```{r q6, echo=TRUE, tidy=TRUE}
 # Let's add a column with the total frequency of each word
 word.totals <- person.year.counts %>% 
@@ -200,7 +201,7 @@ for (i in 1:dim(M)[1]) { # Normalizing every column
 sims <- M %*% t(M)
 ```
 
-Q8. Using the similarity matrix, find the 10 most similar politician-year pairs. Make sure to exclude any self-similarities (e.g. Bernie Sanders is the most similar politician to Bernie Sanders). Print each pair and the similarity score. Make sure to ignore any entries on the diagonal.
+Q8. Using the similarity matrix, find the 10 most similar politician-year pairs. Make sure to exclude any self-similarities (e.g. Bernie Sanders is the most similar politician to Bernie Sanders in 2020). Print each pair and the similarity score. Make sure to ignore any entries on the diagonal. Hint: You may want to use a nested loop to iterate through the data.
 ```{r q8, echo=TRUE, tidy=TRUE}
 ### Your code below
 ```
@@ -223,7 +224,7 @@ model <- word2vec::word2vec(x = tolower(data$text),
 Let's analyze how politicians are represented in this model. Choose a keyword and run the chunk (you will need to ensure the term you use is in the vocabulary, you will get an error if a word is not recognized). Answer the question below.
 ```{r q9, echo=TRUE, tidy=TRUE}
 keyword <- "" # Select an appropriate term here
-predict(model, keyword, type = "nearest", top_n = 20)
+predict(model, keyword, type = "nearest", top_n = 10)
 ```
 Describe what the results show. Do these results make any sense? Answer:
 
@@ -233,12 +234,16 @@ For the final part of this assignment you will train a topic model on the corpus
 
 The code below creates a new variable called `party`, indicating whether a politician is a Democrat or a Republican. To help make the computation easier we will restrict our focus to the subset of tweets that were written in 2021.
 
+```{r q13prep, echo=TRUE, tidy=TRUE}
+# Run this chunk without modifying the code
+data$party <- factor(ifelse(data$screen_name %in% c("JoeBiden","KamalaHarris","SpeakerPelosi","BernieSanders","AOC","SenSchumer"), "Democrat", "Republican"))
+data <- data %>% filter(year == 2021) # Using only 2021 data
+meta <- data %>% select(party, screen_name, month) # Extracting metadata
+```
+
 Q.13
 Modify the `textProcessor` function to use the same stopwords as  above. You will also need to modify the `removestopwords` argument, otherwise the model will remove the stopwords above *and* those in the preset lexicon. *Note: It make take a couple of minutes for this chunk to run.*
 ```{r q13, echo=TRUE, tidy=TRUE}
-data$party <- factor(ifelse(data$screen_name %in% c("JoeBiden","KamalaHarris","SpeakerPelosi","BernieSanders","AOC","SenSchumer"), "Democrat", "Republican"))
-data <- data %>% filter(year == 2021)
-meta <- data %>% select(party, screen_name, month)
 processed.docs <- textProcessor(data$text, metadata = meta) # Add the two stopwords arguments
 output <- prepDocuments(processed.docs$documents, processed.docs$vocab, processed.docs$meta, lower.thresh = 10)
 ```
@@ -257,16 +262,19 @@ fit <- stm(documents = output$documents, vocab = output$vocab,
            )
 ```
 
-Q.15. We can plot the topic proportions to get the topics that occur most frequently. 
+Q.15. We can plot the topic proportions to get the topics that occur most frequently. Run the code below and inspect the results.
+
+```{r q15p, echo=TRUE, tidy = TRUE}
+plot(fit, type = "summary")
+```
 
 We can extract these values by manipulating results of the `make.dt` function, which provides us with a vector of topic proportions for each document. This code uses `doc.props` and `doc.count` create a object creating the average proportion of each topic over all documents (the result should have the dimension `K x 1`). The results the 5 topics with the highest proportions in the corpus. 
 
-Review the code carefully then add arguments to `summarize_if` to take the sum of all numeric columns in `doc.props`.
+Review the code carefully then add arguments to `summarize_if` to take the sum of all numeric columns in `doc.props`. Hint: Run the first lines and inspect `doc.pops` and `doc.count` first to see how they are structured.
 ```{r q15, echo=TRUE, tidy=TRUE}
-plot(fit, type = "summary")
-
 doc.props <- make.dt(fit) # gets document proportions
 doc.count <- dim(doc.props)[1] # gets number of documents
+
 top5 <- doc.props %>% summarize_if() %>% # complete arguments
   select_if(str_detect(names(.), "Topic")) %>%
   divide_by(doc.count) %>% t() %>% as.data.frame() %>%
@@ -278,6 +286,7 @@ Q.16. Explore these five topics using any of the functions covered in lecture or
 ```{r q16, echo=TRUE, tidy=TRUE}
 
 ```
+
 Name and describe each of the five topics.
 
   1. Name: Description:
